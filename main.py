@@ -122,7 +122,8 @@ def getProducts(data):
 urls = leerJson()
 print('Esto en ejecución...')
 for url in urls:
-    try:
-        getProducts(url)
-    except:
-        print('Error al analizar el sitio web')
+    getProducts(url)
+    # try:
+    #     getProducts(url)
+    # except:
+    #     print('Error al analizar el sitio web')
