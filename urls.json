@@ -1,0 +1,38 @@
+[
+  {
+    "titulo": "NUEVO",
+    "url": "https://www.amazon.es/gp/goldbox/?ie=UTF8&deals-widget=%257B%2522version%2522%253A1%252C%2522viewIndex%2522%253A0%252C%2522presetId%2522%253A%2522deals-collection-dealomatic%2522%252C%2522departments%2522%253A%255B%2522599370031%2522%252C%2522599391031%2522%252C%2522667049031%2522%252C%25223628728031%2522%252C%2522599379031%2522%252C%2522599388031%2522%252C%2522599382031%2522%252C%2522665477031%2522%252C%2522664659031%2522%252C%2522664660031%2522%252C%2522934056031%2522%255D%252C%2522sorting%2522%253A%2522BY_SCORE%2522%257D&pd_rd_w=l1kAD&pf_rd_p=ec2d2d08-5797-43be-b218-2091f9273a01&pf_rd_r=JXZ7QCJ243M8E55AH0TA&pd_rd_r=f55c6137-35d0-4d0c-bbf2-db26e6f97219&pd_rd_wg=oeL1s&ref_=pd_gw_unk",
+    "categoria": "ofertas"
+  },
+  {
+    "titulo": "NUEVO",
+    "url": "https://www.amazon.es/gp/goldbox/?ie=UTF8&deals-widget=%257B%2522version%2522%253A1%252C%2522viewIndex%2522%253A60%252C%2522presetId%2522%253A%2522deals-collection-dealomatic%2522%252C%2522departments%2522%253A%255B%2522599370031%2522%252C%2522599391031%2522%252C%2522667049031%2522%252C%25223628728031%2522%252C%2522599379031%2522%252C%2522599388031%2522%252C%2522599382031%2522%252C%2522665477031%2522%252C%2522664659031%2522%252C%2522664660031%2522%252C%2522934056031%2522%255D%252C%2522sorting%2522%253A%2522BY_SCORE%2522%257D&pd_rd_w=l1kAD&pf_rd_p=ec2d2d08-5797-43be-b218-2091f9273a01&pf_rd_r=JXZ7QCJ243M8E55AH0TA&pd_rd_r=f55c6137-35d0-4d0c-bbf2-db26e6f97219&pd_rd_wg=oeL1s&ref_=pd_gw_unk",
+    "categoria": "ofertas"
+  },
+  {
+    "titulo": "NUEVO",
+    "url": "https://www.amazon.es/gp/goldbox/?ie=UTF8&deals-widget=%257B%2522version%2522%253A1%252C%2522viewIndex%2522%253A120%252C%2522presetId%2522%253A%2522deals-collection-dealomatic%2522%252C%2522departments%2522%253A%255B%2522599370031%2522%252C%2522599391031%2522%252C%2522667049031%2522%252C%25223628728031%2522%252C%2522599379031%2522%252C%2522599388031%2522%252C%2522599382031%2522%252C%2522665477031%2522%252C%2522664659031%2522%252C%2522664660031%2522%252C%2522934056031%2522%255D%252C%2522sorting%2522%253A%2522BY_SCORE%2522%257D&pd_rd_w=l1kAD&pf_rd_p=ec2d2d08-5797-43be-b218-2091f9273a01&pf_rd_r=JXZ7QCJ243M8E55AH0TA&pd_rd_r=f55c6137-35d0-4d0c-bbf2-db26e6f97219&pd_rd_wg=oeL1s&ref_=pd_gw_unk",
+    "categoria": "ofertas"
+  },
+  {
+    "titulo": "NUEVO",
+    "url": "https://www.amazon.es/s?i=computers&bbn=3582001031&pf_rd_i=3582001031&pf_rd_m=A1AT7YVPFBWXBL&pf_rd_p=37c76c78-51c7-4702-9493-2dff34cd494b&pf_rd_r=4HWAMBZ3AZGPH3DVB94N&pf_rd_s=merchandised-search-4&pf_rd_t=101&ref=s9_acss_bw_cg_AWES20_1a1_w",
+    "categoria": "ofertas"
+  },
+  {
+    "titulo": "REACONDICIONADO",
+    "url": "https://www.amazon.es/s?i=kitchen&bbn=3582001031&page=2&pf_rd_i=3582001031&pf_rd_m=A1AT7YVPFBWXBL&pf_rd_p=37c76c78-51c7-4702-9493-2dff34cd494b&pf_rd_r=4HWAMBZ3AZGPH3DVB94N&pf_rd_s=merchandised-search-4&pf_rd_t=101&qid=1627772849&ref=sr_pg_1",
+    "categoria": "reacondicionado"
+  },
+  {
+    "titulo": "REACONDICIONADO",
+    "url": "https://www.amazon.es/s?i=videogames&bbn=3582001031&pf_rd_i=3582001031&pf_rd_m=A1AT7YVPFBWXBL&pf_rd_p=37c76c78-51c7-4702-9493-2dff34cd494b&pf_rd_r=4HWAMBZ3AZGPH3DVB94N&pf_rd_s=merchandised-search-4&pf_rd_t=101&ref=s9_acss_bw_cg_AWES20_1c1_w",
+    "categoria": "reacondicionado"
+  },
+   {
+    "titulo": "REACONDICIONADO",
+    "url": "https://www.amazon.es/s?i=electronics&bbn=3582001031&page=2&pf_rd_i=3582001031&pf_rd_m=A1AT7YVPFBWXBL&pf_rd_p=37c76c78-51c7-4702-9493-2dff34cd494b&pf_rd_r=4HWAMBZ3AZGPH3DVB94N&pf_rd_s=merchandised-search-4&pf_rd_t=101&qid=1627772860&ref=sr_pg_1",
+    "categoria": "reacondicionado"
+  }
+
+]
