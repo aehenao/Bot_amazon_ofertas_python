@@ -126,12 +126,10 @@ def getProducts(data):
     #print(products)
 
 print('Esto en ejecución...')
-while True:
-    urls = leerJson()
-    for url in urls:
-        getProducts(url)
+urls = leerJson()
+for url in urls:
+    getProducts(url)
         #try:
             #getProducts(url)
         #except:
             #print('Error al analizar el sitio web')
-    sleep(600)
