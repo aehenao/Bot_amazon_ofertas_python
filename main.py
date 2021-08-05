@@ -9,8 +9,8 @@ import requests
 from requests.structures import CaseInsensitiveDict
 
 
-bot = telebot.TeleBot("1238627815:AAGBjaRN0CxD6zsCTg0tyJSOBt_lw6GZU5M", parse_mode='HTML')
-grupo_id = '@colofertas' #'-413336904'
+bot = telebot.TeleBot("1921336823:AAFuNJvCdCbdKvf4hpz_e9eD7LYAbWKHP5g", parse_mode='HTML')
+grupo_id = '@amazonchollitos'
 
 token_bitly = '0c8fee80ac9992a329cf79318389750afc05ef15'
 con = sqlite3.connect('data.db')
@@ -19,9 +19,11 @@ cur = con.cursor()
 fecha = datetime.now()
 hoy = fecha.strftime('%Y-%m-%d')
 fecha_msg = fecha.strftime('%Y-%m-%d %H:%M')
-
+afiliado = '&_encoding=UTF8&tag=yjafiliados-21&linkCode=ur2'
 tiempo = 60 #En segundos
 
+print(fecha.hour)
+exit()
 emojis = {
 	'rayo': "\U000026A1",
 	'check': "\U00002705",
@@ -91,7 +93,7 @@ def scrapingOfertasDiarias(content, header, categoria):
             'image': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs['src'],
             'discount': int(discount[2]) if len(discount) == 3 else 0,
             'stars': stars.attrs['aria-label'][13:] if stars != None else 'Ninguna',
-            'link': acortarURL(item.xpath('//span[1]/div[1]/a[3]', first=True).attrs['href'])
+            'link': acortarURL(item.xpath('//span[1]/div[1]/a[3]', first=True).attrs['href'] + afiliado)
         }
 
         #SI EL DESCUENTO ES MAYO O IGUAL AL 30% ENTONCES NOTIFICO POR TELEGRAM Y REGISTRO EN LA BD
@@ -119,11 +121,13 @@ def getProducts(data):
 
     #print(products)
 
-urls = leerJson()
 print('Esto en ejecución...')
-for url in urls:
-    getProducts(url)
-    # try:
-    #     getProducts(url)
-    # except:
-    #     print('Error al analizar el sitio web')
+while True:
+    now = datetime.now()
+    if now.hour > 7 and now.hour < 20:
+        urls = leerJson()
+        for url in urls:
+            try:
+                getProducts(url)
+            except:
+                print('Error al analizar el sitio web')
