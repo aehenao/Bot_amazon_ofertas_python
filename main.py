@@ -22,8 +22,6 @@ fecha_msg = fecha.strftime('%Y-%m-%d %H:%M')
 afiliado = '&_encoding=UTF8&tag=yjafiliados-21&linkCode=ur2'
 tiempo = 60 #En segundos
 
-print(fecha.hour)
-exit()
 emojis = {
 	'rayo': "\U000026A1",
 	'check': "\U00002705",
@@ -131,3 +129,4 @@ while True:
                 getProducts(url)
             except:
                 print('Error al analizar el sitio web')
+        sleep(600)
