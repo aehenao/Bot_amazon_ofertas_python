@@ -20,7 +20,7 @@ fecha = datetime.now()
 hoy = fecha.strftime('%Y-%m-%d')
 fecha_msg = fecha.strftime('%Y-%m-%d %H:%M')
 afiliado = '&_encoding=UTF8&tag=yjafiliados-21&linkCode=ur2'
-tiempo = 60 #En segundos
+tiempo = 300 #En segundos
 
 emojis = {
 	'rayo': "\U000026A1",
@@ -79,32 +79,35 @@ def send_message(url_img, text):
 
 def scrapingOfertasDiarias(content, header, categoria):
     for item in content:
-        precios = item.xpath('//span[@class="a-size-medium"]')
-        discount = re.findall(r'\d+\.?\d',item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]', first=True).text) if item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]', first=True) != None else 0
-        stars = item.xpath('//a[@data-testid="link-review-component"]', first=True)
-        pvp = item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]/div[1]/span[1]/span[1]', first=True)
+        try:
+            precios = item.xpath('//span[@class="a-size-medium"]')
+            discount = re.findall(r'\d+\.?\d',item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]', first=True).text) if item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]', first=True) != None else 0
+            stars = item.xpath('//a[@data-testid="link-review-component"]', first=True)
+            pvp = item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]/div[1]/span[1]/span[1]', first=True)
 
-        products = {
-            'title': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs['alt'],
-            'price': item.xpath('//span[@class="a-price"]/span[2]', first=True).text,
-            'pvp': pvp.text if pvp != None  else 0,
-            'image': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs['src'],
-            'discount': int(discount[2]) if len(discount) == 3 else 0,
-            'stars': stars.attrs['aria-label'][13:] if stars != None else 'Ninguna',
-            'link': acortarURL(item.xpath('//span[1]/div[1]/a[3]', first=True).attrs['href'] + afiliado)
-        }
+            products = {
+                'title': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs['alt'],
+                'price': item.xpath('//span[@class="a-price"]/span[2]', first=True).text,
+                'pvp': pvp.text if pvp != None  else 0,
+                'image': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs['src'],
+                'discount': int(discount[2]) if len(discount) == 3 else 0,
+                'stars': stars.attrs['aria-label'][13:] if stars != None else 'Ninguna',
+                'link': acortarURL(item.xpath('//span[1]/div[1]/a[3]', first=True).attrs['href'] + afiliado)
+            }
 
-        #SI EL DESCUENTO ES MAYO O IGUAL AL 30% ENTONCES NOTIFICO POR TELEGRAM Y REGISTRO EN LA BD
-        if products['discount'] >= 30:
-            res = __existInDB(products['title'])
-            if res['exists'] == False:
-                if categoria == 'ofertas':
-                    msg = f"{emojis['sparkles']}<b>{header}</b>{emojis['sparkles']}\n\n{emojis['rayo']}<b>{products['title']}</b>{emojis['rayo']}\n\n<b>{emojis['check']}Precio Oferta:{products['price']} {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['discount']}%</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']}<b>Estrellas:</b> {products['stars']}\n\n{emojis['link']}Link: {products['link']}"
-                else:
-                    msg = f"{emojis['recycling']}<b>{header}</b>{emojis['recycling']}\n\n{emojis['rayo']}<b>{products['title']}</b>{emojis['rayo']}\n\n<b>{emojis['check']}Precio Oferta:{products['price']} {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['discount']}%</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']}<b>Estrellas:</b> {products['stars']}\n\n{emojis['link']}Link: {products['link']}"
-                send_message(products['image'], msg)
-                registrarHistorial(products)
-                sleep(tiempo)
+            #SI EL DESCUENTO ES MAYO O IGUAL AL 30% ENTONCES NOTIFICO POR TELEGRAM Y REGISTRO EN LA BD
+            if products['discount'] >= 30:
+                res = __existInDB(products['title'])
+                if res['exists'] == False:
+                    if categoria == 'ofertas':
+                        msg = f"{emojis['sparkles']}<b>{header}</b>{emojis['sparkles']}\n\n{emojis['rayo']}<b>{products['title']}</b>{emojis['rayo']}\n\n<b>{emojis['check']}Precio Oferta:{products['price']} {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['discount']}%</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']}<b>Estrellas:</b> {products['stars']}\n\n{emojis['link']}Link: {products['link']}"
+                    else:
+                        msg = f"{emojis['recycling']}<b>{header}</b>{emojis['recycling']}\n\n{emojis['rayo']}<b>{products['title']}</b>{emojis['rayo']}\n\n<b>{emojis['check']}Precio Oferta:{products['price']} {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['discount']}%</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']}<b>Estrellas:</b> {products['stars']}\n\n{emojis['link']}Link: {products['link']}"
+                    send_message(products['image'], msg)
+                    registrarHistorial(products)
+                    sleep(tiempo)
+        except:
+            print('Error al realizar scraping ' + fecha_msg)
 
 def getProducts(data):
     s = HTMLSession()
