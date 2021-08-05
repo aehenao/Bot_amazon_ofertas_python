@@ -100,9 +100,9 @@ def scrapingOfertasDiarias(content, header, categoria):
                 res = __existInDB(products['title'])
                 if res['exists'] == False:
                     if categoria == 'ofertas':
-                        msg = f"{emojis['sparkles']}<b>{header}</b>{emojis['sparkles']}\n\n{emojis['rayo']}<b>{products['title']}</b>{emojis['rayo']}\n\n<b>{emojis['check']}Precio Oferta:{products['price']} {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['discount']}%</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']}<b>Estrellas:</b> {products['stars']}\n\n{emojis['link']}Link: {products['link']}"
+                        msg = f"{emojis['sparkles']} <b>{header}</b> {emojis['sparkles']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']}Precio Oferta:{products['price']} {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
                     else:
-                        msg = f"{emojis['recycling']}<b>{header}</b>{emojis['recycling']}\n\n{emojis['rayo']}<b>{products['title']}</b>{emojis['rayo']}\n\n<b>{emojis['check']}Precio Oferta:{products['price']} {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['discount']}%</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']}<b>Estrellas:</b> {products['stars']}\n\n{emojis['link']}Link: {products['link']}"
+                        msg = f"{emojis['recycling']} <b>{header}</b> {emojis['recycling']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n<b>{emojis['check']} Precio Oferta:{products['price']} {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
                     send_message(products['image'], msg)
                     registrarHistorial(products)
                     sleep(tiempo)
@@ -115,8 +115,11 @@ def getProducts(data):
     r.html.render(sleep=2)
     content = r.html.xpath('//div[@role="main"]/div/div')
     if data['categoria'] == 'ofertas':
+        print(f"Inicio el analisis (ofertas) para: {data['url']}")
         scrapingOfertasDiarias(content, data['titulo'], data['categoria'])
-    elif data['categoria'] == 'normal':
+    elif data['categoria'] == 'reacondicionado':
+        scrapingOfertasDiarias(content, data['titulo'], data['categoria'])
+        print(f"Inicio el analisis (reacondicionado) para: {data['url']}")
         pass
 
 
@@ -124,12 +127,11 @@ def getProducts(data):
 
 print('Esto en ejecución...')
 while True:
-    now = datetime.now()
-    if now.hour > 7 and now.hour < 20:
-        urls = leerJson()
-        for url in urls:
-            try:
-                getProducts(url)
-            except:
-                print('Error al analizar el sitio web')
-        sleep(600)
+    urls = leerJson()
+    for url in urls:
+        getProducts(url)
+        #try:
+            #getProducts(url)
+        #except:
+            #print('Error al analizar el sitio web')
+    sleep(600)

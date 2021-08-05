@@ -25,6 +25,16 @@
     "categoria": "ofertas"
   },
   {
+    "titulo": "NUEVO",
+    "url": "https://www.amazon.es/s?rh=n%3A664684031%2Cp_72%3A4-&pf_rd_i=664684031&pf_rd_p=755966c5-97ad-5bce-b8e4-cb5ec1991058&pf_rd_r=9ZZ56J2N6XPS260TB24H&pf_rd_s=merchandised-search-10&pf_rd_t=BROWSE&ref=Oct_s9_apbd_otopr_hd_bw_biywgB_S",
+    "categoria": "ofertas"
+  },
+  {
+    "titulo": "NUEVO",
+    "url": "https://www.amazon.es/s?i=electronics&rh=n%3A664684031%2Cp_72%3A831280031&page=2&pf_rd_i=664684031&pf_rd_p=755966c5-97ad-5bce-b8e4-cb5ec1991058&pf_rd_r=9ZZ56J2N6XPS260TB24H&pf_rd_s=merchandised-search-10&pf_rd_t=BROWSE&qid=1628168056&ref=sr_pg_2",
+    "categoria": "ofertas"
+  },
+  {
     "titulo": "REACONDICIONADO",
     "url": "https://www.amazon.es/s?i=kitchen&bbn=3582001031&page=2&pf_rd_i=3582001031&pf_rd_m=A1AT7YVPFBWXBL&pf_rd_p=37c76c78-51c7-4702-9493-2dff34cd494b&pf_rd_r=4HWAMBZ3AZGPH3DVB94N&pf_rd_s=merchandised-search-4&pf_rd_t=101&qid=1627772849&ref=sr_pg_1",
     "categoria": "reacondicionado"
