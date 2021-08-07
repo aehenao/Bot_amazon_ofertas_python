@@ -61,53 +61,71 @@ def registrarHistorial(products):
     pass
 
 def acortarURL(link):
-    url = "https://api-ssl.bitly.com/v4/shorten"
-    headers = CaseInsensitiveDict()
-    headers["Authorization"] = f"Bearer {token_bitly}"
-    headers["Content-Type"] = "application/json"
-    data = {"long_url": f"{link}","domain": "bit.ly"}
-    #data = '{"long_url": "{}","domain": "bit.ly"}'.format(url)
+    try:
+        url = "https://api-ssl.bitly.com/v4/shorten"
+        headers = CaseInsensitiveDict()
+        headers["Authorization"] = f"Bearer {token_bitly}"
+        headers["Content-Type"] = "application/json"
+        data = {"long_url": f"{link}","domain": "bit.ly"}
+        #data = '{"long_url": "{}","domain": "bit.ly"}'.format(url)
 
-    resp = requests.post(url, headers=headers, data=json.dumps(data))
-    resJson = resp.json()
-
-    return resJson['link']
+        resp = requests.post(url, headers=headers, data=json.dumps(data))
+        resJson = resp.json()
+        #print(resp.json())
+        return resJson['link']
+    except:
+        return link
 
 
 def send_message(url_img, text):
     bot.send_photo(grupo_id,url_img, text)
 
 def formatStringFloat(cadena):
-    return float(str(cadena).replace(',','.'))
+    return float(str(cadena).replace(',','.').replace('€',''))
 
 def scrapingOfertasDiarias(content, header, categoria):
     for item in content:
         try:
             precios = item.xpath('//span[@class="a-size-medium"]')
-            discount = re.findall(r'\d+\.?\d',item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]', first=True).text) if item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]', first=True) != None else 0
+            discount = re.findall(r'\d+\.?\d',
+                                  item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]', first=True).text) if item.xpath(
+                '//span[1]/div[1]/a[2]/span[1]/div[1]', first=True) != None else '0'
             stars = item.xpath('//a[@data-testid="link-review-component"]', first=True)
             pvp = item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]/div[1]/span[1]/span[1]', first=True)
+            price = item.xpath('//span[@class="a-price"]/span[2]', first=True).text if item.xpath(
+                '//span[@class="a-price"]/span[2]', first=True) != None else 0
+            price_discount = 0
+            try:
+                if len(discount) == 3:
+                    discount = discount[2]
+                    price_discount = rount(formatStringFloat(price) * (int(str(discount)) / 100), 2)
+            except:
+                price_discount = '0'
 
             products = {
-                'title': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs['alt'],
-                'price': item.xpath('//span[@class="a-price"]/span[2]', first=True).text,
-                'pvp': pvp.text if pvp != None  else 0,
-                'image': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs['src'],
-                'discount': int(discount[2]) if len(discount) == 3 else 0,
+                'title': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs[
+                    'alt'],
+                'price': price,
+                'pvp': pvp.text if pvp != None else 0,
+                'image': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs[
+                    'src'],
+                'discount': discount if type(discount) != type(list()) else discount[:1],
                 'stars': stars.attrs['aria-label'][13:] if stars != None else 'Ninguna',
-                'link': acortarURL(item.xpath('//span[1]/div[1]/a[3]', first=True).attrs['href'] + afiliado)
+                'link': acortarURL(
+                    item.xpath('//span[1]/div[1]/a[3]', first=True).attrs['href'] + afiliado) if item.xpath(
+                    '//span[1]/div[1]/a[3]', first=True) != None else None
             }
 
-            #SI EL DESCUENTO ES MAYO O IGUAL AL 30% ENTONCES NOTIFICO POR TELEGRAM Y REGISTRO EN LA BD
-            if products['discount'] >= 30:
+            # SI EL DESCUENTO ES MAYOR O IGUAL AL 30% ENTONCES NOTIFICO POR TELEGRAM Y REGISTRO EN LA BD
+            if int(products['discount']) >= 30 and products['link'] != None:
                 res = __existInDB(products['title'])
                 if res['exists'] == False:
-                    msg = f"{emojis['sparkles']} <b>{header}</b> {emojis['sparkles']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n{emojis['check']} <b>Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
+                    msg = f"{emojis['sparkles']} <b>{header}</b> {emojis['sparkles']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n{emojis['check']} <b>Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {price_discount} € ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
                     send_message(products['image'], msg)
                     registrarHistorial(products)
                     sleep(tiempo)
         except:
-            print('Error al realizar scraping ' + fecha_msg)
+            print('Error al realizar scraping ofertas ' + fecha_msg)
 
 def scrapingReacondicionados(content, header, categoria):
     for item in content:
@@ -120,10 +138,12 @@ def scrapingReacondicionados(content, header, categoria):
             try:
                 pvp = elem_pvp.text
                 price = formatStringFloat(elem_price.text[:5])
+                price_discount = 0
                 discount = 0
                 stars = elem_stars.attrs['aria-label']
                 if pvp != None and price != None:
                     discount = round(price / formatStringFloat(pvp[:5]),2) * 100
+                    price_discount = price * (discount/100)
 
                 products = {
                         'title': item.xpath('//img[@data-image-latency="s-product-image"]', first=True).find('img')[0].attrs['alt'],
@@ -138,7 +158,7 @@ def scrapingReacondicionados(content, header, categoria):
                 if discount > 30:
                     res = __existInDB(products['title'])
                     if res['exists'] == False:
-                        msg = f"{emojis['recycling']} <b>{header}</b> {emojis['recycling']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']} Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
+                        msg = f"{emojis['recycling']} <b>{header}</b> {emojis['recycling']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']} Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {price_discount} € ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
                         send_message(products['image'], msg)
                         registrarHistorial(products)
                         sleep(tiempo)
@@ -172,11 +192,11 @@ def getProducts(data):
     #print(products)
 
 print('Esto en ejecución...')
-while True:
-    urls = leerJson()
-    for url in urls:
-            try:
-                getProducts(url)
-            except:
-                print('Error al analizar el sitio web')
-    sleep(600)
+
+urls = leerJson()
+for url in urls:
+    try:
+        print('Analizando la url para ' + url['categoria'])
+        getProducts(url)
+    except:
+        print('Error al analizar el sitio web')
