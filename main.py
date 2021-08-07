@@ -99,6 +99,10 @@ def scrapingOfertasDiarias(content, header, categoria):
                 if len(discount) == 3:
                     discount = discount[2]
                     price_discount = rount(formatStringFloat(price) * (int(str(discount)) / 100), 2)
+                else:
+                    discount = discount[:1]
+                    price_discount = rount(formatStringFloat(price) * (int(str(discount)) / 100), 2)
+
             except:
                 price_discount = '0'
 
