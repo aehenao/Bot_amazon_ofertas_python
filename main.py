@@ -77,6 +77,9 @@ def acortarURL(link):
 def send_message(url_img, text):
     bot.send_photo(grupo_id,url_img, text)
 
+def formatStringFloat(cadena):
+    return float(str(cadena).replace(',','.'))
+
 def scrapingOfertasDiarias(content, header, categoria):
     for item in content:
         try:
@@ -99,37 +102,81 @@ def scrapingOfertasDiarias(content, header, categoria):
             if products['discount'] >= 30:
                 res = __existInDB(products['title'])
                 if res['exists'] == False:
-                    if categoria == 'ofertas':
-                        msg = f"{emojis['sparkles']} <b>{header}</b> {emojis['sparkles']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']}Precio Oferta:{products['price']} {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
-                    else:
-                        msg = f"{emojis['recycling']} <b>{header}</b> {emojis['recycling']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n<b>{emojis['check']} Precio Oferta:{products['price']} {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
+                    msg = f"{emojis['sparkles']} <b>{header}</b> {emojis['sparkles']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']} Precio Oferta:{products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
                     send_message(products['image'], msg)
                     registrarHistorial(products)
                     sleep(tiempo)
         except:
             print('Error al realizar scraping ' + fecha_msg)
 
+def scrapingReacondicionados(content, header, categoria):
+    for item in content:
+        elem_pvp = item.xpath('.//span[contains(@class, "a-text-price")]/span[1]', first=True)
+        elem_price = item.xpath('.//span[@class="a-price"]/span[1]', first=True)
+        elem_stars = item.xpath('.//div[1]/span[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[2]/div[1]/span[1]', first=True)
+        elem_link = item.xpath('.//div[1]/span[1]/div[1]/div[1]/div[2]/div[2]/div[1]/div[1]/div[1]', first=True)
+
+        if elem_pvp != None and elem_price != None and elem_stars != None and elem_link != None:
+            try:
+                pvp = elem_pvp.text
+                price = formatStringFloat(elem_price.text[:5])
+                discount = 0
+                stars = elem_stars.attrs['aria-label']
+                if pvp != None and price != None:
+                    discount = round(price / formatStringFloat(pvp[:5]),2) * 100
+
+                products = {
+                        'title': item.xpath('//img[@data-image-latency="s-product-image"]', first=True).find('img')[0].attrs['alt'],
+                        'price': elem_price.text,
+                        'pvp': pvp,
+                        'image': item.xpath('//img[@data-image-latency="s-product-image"]', first=True).find('img')[0].attrs['src'],
+                        'discount': discount,
+                        'stars': stars,
+                        'link': acortarURL('https://www.amazon.es/' + elem_link.find('a')[0].attrs['href'] + afiliado)
+                    }
+
+                if discount > 30:
+                    res = __existInDB(products['title'])
+                    if res['exists'] == False:
+                        msg = f"{emojis['recycling']} <b>{header}</b> {emojis['recycling']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']} Precio Oferta:{products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
+                        send_message(products['image'], msg)
+                        registrarHistorial(products)
+                        sleep(tiempo)
+            except:
+                print('Error al realizar scraping para productos reacondicionados ' + fecha_msg)
+                pass
+
+
 def getProducts(data):
+    div_content = ''
+
+    if data['categoria'] == 'ofertas':
+        div_content = '//div[@role="main"]/div/div'
+    elif data['categoria'] == 'reacondicionado':
+        div_content = '//div[contains(@class, "s-result-item")]'
+
     s = HTMLSession()
     r = s.get(data['url'])
     r.html.render(sleep=2)
-    content = r.html.xpath('//div[@role="main"]/div/div')
+    content = r.html.xpath(div_content)
+    print(len(content))
     if data['categoria'] == 'ofertas':
         print(f"Inicio el analisis (ofertas) para: {data['url']}")
         scrapingOfertasDiarias(content, data['titulo'], data['categoria'])
     elif data['categoria'] == 'reacondicionado':
-        scrapingOfertasDiarias(content, data['titulo'], data['categoria'])
         print(f"Inicio el analisis (reacondicionado) para: {data['url']}")
-        pass
+        scrapingReacondicionados(content, data['titulo'], data['categoria'])
+
 
 
     #print(products)
 
 print('Esto en ejecución...')
-urls = leerJson()
-for url in urls:
-    getProducts(url)
-        #try:
-            #getProducts(url)
-        #except:
-            #print('Error al analizar el sitio web')
+while True:
+    urls = leerJson()
+    for url in urls:
+            try:
+                getProducts(url)
+            except:
+                print('Error al analizar el sitio web')
+    sleep(600)
