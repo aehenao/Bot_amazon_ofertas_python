@@ -102,7 +102,7 @@ def scrapingOfertasDiarias(content, header, categoria):
             if products['discount'] >= 30:
                 res = __existInDB(products['title'])
                 if res['exists'] == False:
-                    msg = f"{emojis['sparkles']} <b>{header}</b> {emojis['sparkles']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']} Precio Oferta:{products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
+                    msg = f"{emojis['sparkles']} <b>{header}</b> {emojis['sparkles']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n{emojis['check']} <b>Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
                     send_message(products['image'], msg)
                     registrarHistorial(products)
                     sleep(tiempo)
@@ -138,7 +138,7 @@ def scrapingReacondicionados(content, header, categoria):
                 if discount > 30:
                     res = __existInDB(products['title'])
                     if res['exists'] == False:
-                        msg = f"{emojis['recycling']} <b>{header}</b> {emojis['recycling']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']} Precio Oferta:{products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
+                        msg = f"{emojis['recycling']} <b>{header}</b> {emojis['recycling']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']} Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['pvp']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
                         send_message(products['image'], msg)
                         registrarHistorial(products)
                         sleep(tiempo)
