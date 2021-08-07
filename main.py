@@ -96,7 +96,7 @@ def scrapingOfertasDiarias(content, header, categoria):
                 '//span[@class="a-price"]/span[2]', first=True) != None else 0
             price_discount = 0
             try:
-                if len(discount) == 3:
+                if type(discount) != type(list()):
                     discount = discount[2]
                     price_discount = rount(formatStringFloat(price) * (int(str(discount)) / 100), 2)
                 else:
