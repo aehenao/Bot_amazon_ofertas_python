@@ -94,13 +94,17 @@ def scrapingOfertasDiarias(content, header, categoria):
             pvp = item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]/div[1]/span[1]/span[1]', first=True)
             price = item.xpath('//span[@class="a-price"]/span[2]', first=True).text if item.xpath(
                 '//span[@class="a-price"]/span[2]', first=True) != None else 0
+            ele_link = item.xpath('//span[1]/div[1]/a[3]', first=True).attrs['href'] + afiliado if item.xpath(
+                    '//span[1]/div[1]/a[3]', first=True) != None else None
+
             price_discount = 0
             try:
-                if type(discount) != type(list()):
-                    discount = discount[2]
+                if type(discount) == type(list()):
+                    discount = discount[2] if len(discount) == 3 else discount
 
                 else:
-                    discount = discount[:1]
+                    discount =  discount[1] if len(discount) == 2 else discount
+
 
             except:
                 pass
@@ -114,9 +118,7 @@ def scrapingOfertasDiarias(content, header, categoria):
                     'src'],
                 'discount': discount if type(discount) != type(list()) else discount[:1],
                 'stars': stars.attrs['aria-label'][13:] if stars != None else 'Ninguna',
-                'link': acortarURL(
-                    item.xpath('//span[1]/div[1]/a[3]', first=True).attrs['href'] + afiliado) if item.xpath(
-                    '//span[1]/div[1]/a[3]', first=True) != None else None
+                'link': acortarURL(ele_link)
             }
 
             # SI EL DESCUENTO ES MAYOR O IGUAL AL 30% ENTONCES NOTIFICO POR TELEGRAM Y REGISTRO EN LA BD
@@ -128,7 +130,7 @@ def scrapingOfertasDiarias(content, header, categoria):
                     registrarHistorial(products)
                     sleep(tiempo)
         except:
-            print('Error al realizar scraping ofertas ' + fecha_msg)
+            pass
 
 def scrapingReacondicionados(content, header, categoria):
     for item in content:
@@ -164,7 +166,7 @@ def scrapingReacondicionados(content, header, categoria):
                         registrarHistorial(products)
                         sleep(tiempo)
             except:
-                print('Error al realizar scraping para productos reacondicionados ' + fecha_msg)
+                #print('Error al realizar scraping para productos reacondicionados ' + fecha_msg)
                 pass
 
 
@@ -192,14 +194,12 @@ def getProducts(data,s):
     #print(products)
 
 print('Esto en ejecución...')
-while True:
-    urls = leerJson()
-    s = HTMLSession()
-
-    for url in urls:
-        try:
-            print('Analizando la url para ' + url['categoria'])
-            getProducts(url,s)
-        except:
-            print('Error al analizar el sitio web')
-    s.close()
+urls = leerJson()
+s = HTMLSession()
+for url in urls:
+    try:
+        print('Analizando la url para ' + url['categoria'])
+        getProducts(url, s)
+    except:
+        print('Error al analizar el sitio web')
+s.close()
