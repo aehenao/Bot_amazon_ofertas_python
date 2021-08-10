@@ -94,10 +94,12 @@ def scrapingOfertasDiarias(content, header, categoria):
             pvp = item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]/div[1]/span[1]/span[1]', first=True)
             price = item.xpath('//span[@class="a-price"]/span[2]', first=True).text if item.xpath(
                 '//span[@class="a-price"]/span[2]', first=True) != None else 0
+            #price_discount = item.xpath('//span[@class="a-price"]/span[1]', first=True).text if item.xpath(
+                #'//span[@class="a-price"]/span[2]', first=True) != None else 0
             ele_link = item.xpath('//span[1]/div[1]/a[3]', first=True).attrs['href'] + afiliado if item.xpath(
                     '//span[1]/div[1]/a[3]', first=True) != None else None
 
-            price_discount = 0
+            print(item.xpath('//span[@class="a-price"]/span[1]', first=True))
             try:
                 if type(discount) == type(list()):
                     discount = discount[2] if len(discount) == 3 else discount
@@ -121,7 +123,7 @@ def scrapingOfertasDiarias(content, header, categoria):
                 'link': acortarURL(ele_link)
             }
 
-            # SI EL DESCUENTO ES MAYOR O IGUAL AL 30% ENTONCES NOTIFICO POR TELEGRAM Y REGISTRO EN LA BD
+            #SI EL DESCUENTO ES MAYOR O IGUAL AL 30% ENTONCES NOTIFICO POR TELEGRAM Y REGISTRO EN LA BD
             if int(products['discount']) >= 30 and products['link'] != None:
                 res = __existInDB(products['title'])
                 if res['exists'] == False:
@@ -193,7 +195,7 @@ def getProducts(data,s):
 
     #print(products)
 
-print('Esto en ejecución...')
+print(f"Esto en ejecución {fecha_msg}...")
 urls = leerJson()
 s = HTMLSession()
 for url in urls:
