@@ -83,56 +83,55 @@ def send_message(url_img, text):
 def formatStringFloat(cadena):
     return float(str(cadena).replace(',','.').replace('€',''))
 
+
 def scrapingOfertasDiarias(content, header, categoria):
     for item in content:
+        # try:
+        precios = item.xpath('//span[@class="a-size-medium"]')
+        discount = re.findall(r'\d+\.?\d',
+                              item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]', first=True).text) if item.xpath(
+            '//span[1]/div[1]/a[2]/span[1]/div[1]', first=True) != None else '0'
+        stars = item.xpath('//a[@data-testid="link-review-component"]', first=True)
+        pvp = item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]/div[1]/span[1]/span[1]', first=True)
+        price = item.xpath('//span[@class="a-price"]/span[2]', first=True).text if item.xpath(
+            '//span[@class="a-price"]/span[2]', first=True) != None else 0
+        ele_link = item.xpath('//span[1]/div[1]/a[3]', first=True).attrs['href'] + afiliado if item.xpath(
+            '//span[1]/div[1]/a[3]', first=True) != None else None
+
+        price_discount = 0
         try:
-            precios = item.xpath('//span[@class="a-size-medium"]')
-            discount = re.findall(r'\d+\.?\d',
-                                  item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]', first=True).text) if item.xpath(
-                '//span[1]/div[1]/a[2]/span[1]/div[1]', first=True) != None else '0'
-            stars = item.xpath('//a[@data-testid="link-review-component"]', first=True)
-            pvp = item.xpath('//span[1]/div[1]/a[2]/span[1]/div[1]/div[1]/span[1]/span[1]', first=True)
-            price = item.xpath('//span[@class="a-price"]/span[2]', first=True).text if item.xpath(
-                '//span[@class="a-price"]/span[2]', first=True) != None else 0
-            #price_discount = item.xpath('//span[@class="a-price"]/span[1]', first=True).text if item.xpath(
-                #'//span[@class="a-price"]/span[2]', first=True) != None else 0
-            ele_link = item.xpath('//span[1]/div[1]/a[3]', first=True).attrs['href'] + afiliado if item.xpath(
-                    '//span[1]/div[1]/a[3]', first=True) != None else None
+            if type(discount) == type(list()):
+                discount = discount[2] if len(discount) == 3 else discount
+            else:
+                discount = discount[1] if len(discount) == 2 else discount
 
-            print(item.xpath('//span[@class="a-price"]/span[1]', first=True))
-            try:
-                if type(discount) == type(list()):
-                    discount = discount[2] if len(discount) == 3 else discount
-
-                else:
-                    discount =  discount[1] if len(discount) == 2 else discount
-
-
-            except:
-                pass
-
-            products = {
-                'title': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs[
-                    'alt'],
-                'price': price,
-                'pvp': pvp.text if pvp != None else 0,
-                'image': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs[
-                    'src'],
-                'discount': discount if type(discount) != type(list()) else discount[:1],
-                'stars': stars.attrs['aria-label'][13:] if stars != None else 'Ninguna',
-                'link': acortarURL(ele_link)
-            }
-
-            #SI EL DESCUENTO ES MAYOR O IGUAL AL 30% ENTONCES NOTIFICO POR TELEGRAM Y REGISTRO EN LA BD
-            if int(products['discount']) >= 30 and products['link'] != None:
-                res = __existInDB(products['title'])
-                if res['exists'] == False:
-                    msg = f"{emojis['sparkles']} <b>{header}</b> {emojis['sparkles']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n{emojis['check']} <b>Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['price']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
-                    send_message(products['image'], msg)
-                    registrarHistorial(products)
-                    sleep(tiempo)
         except:
             pass
+
+        products = {
+            'title': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs[
+                'alt'],
+            'price': price,
+            'pvp': pvp.text if pvp != None else 0,
+            'image': item.xpath('//div[contains(@class, "a-image-container")]', first=True).find('img')[0].attrs[
+                'src'],
+            'discount': discount if type(discount) != type(list()) else discount[:1],
+            'stars': stars.attrs['aria-label'][13:] if stars != None else 'Ninguna',
+            'link': acortarURL(ele_link)
+        }
+
+        # SI EL DESCUENTO ES MAYOR O IGUAL AL 30% ENTONCES NOTIFICO POR TELEGRAM Y REGISTRO EN LA BD
+        if int(products['discount']) >= 30 and products['link'] != None:
+            res = __existInDB(products['title'])
+            price_discount = round(formatStringFloat(products['pvp']) * int(products['discount']) / 100,2)
+            print('precio de descuento: ' + str(price_discount))
+            if res['exists'] == False:
+                msg = f"{emojis['sparkles']} <b>{header}</b> {emojis['sparkles']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n{emojis['check']} <b>Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {price_discount} € ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
+                send_message(products['image'], msg)
+                registrarHistorial(products)
+                sleep(tiempo)
+    # except:
+    #     pass
 
 def scrapingReacondicionados(content, header, categoria):
     for item in content:
@@ -147,6 +146,7 @@ def scrapingReacondicionados(content, header, categoria):
                 price = formatStringFloat(elem_price.text[:5])
                 discount = 0
                 stars = elem_stars.attrs['aria-label']
+                price_discount = 0
                 if pvp != None and price != None:
                     discount = round(price / formatStringFloat(pvp[:5]),2) * 100
 
@@ -163,7 +163,8 @@ def scrapingReacondicionados(content, header, categoria):
                 if discount > 30:
                     res = __existInDB(products['title'])
                     if res['exists'] == False:
-                        msg = f"{emojis['recycling']} <b>{header}</b> {emojis['recycling']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']} Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {products['price']} ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
+                        price_discount = round(formatStringFloat(products['pvp']) * int(products['discount']) / 100,2)
+                        msg = f"{emojis['recycling']} <b>{header}</b> {emojis['recycling']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']} Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {price_discount} € ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
                         send_message(products['image'], msg)
                         registrarHistorial(products)
                         sleep(tiempo)
