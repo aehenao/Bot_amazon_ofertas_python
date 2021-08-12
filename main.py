@@ -2,6 +2,7 @@ from requests_html import HTMLSession
 import sqlite3
 from datetime import datetime
 import telebot
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from time import sleep
 import json
 import re
@@ -77,12 +78,18 @@ def acortarURL(link):
         return link
 
 
-def send_message(url_img, text):
-    bot.send_photo(grupo_id,url_img, text)
+def send_message(url_img, text, markups):
+    bot.send_photo(grupo_id,url_img, text, reply_markup=markups)
 
 def formatStringFloat(cadena):
     return float(str(cadena).replace(',','.').replace('€',''))
 
+
+def gen_markup(link_producto):
+    markup = InlineKeyboardMarkup()
+    markup.row_width = 1
+    markup.add(InlineKeyboardButton(f"{emojis['sparkles']} Ver en Amazon {emojis['sparkles']}", url=str(link_producto)))
+    return markup
 
 def scrapingOfertasDiarias(content, header, categoria):
     for item in content:
@@ -102,6 +109,9 @@ def scrapingOfertasDiarias(content, header, categoria):
         try:
             if type(discount) == type(list()):
                 discount = discount[2] if len(discount) == 3 else discount
+            elif discount == '0' and pvp != None:
+                discount = round((formatStringFloat(price) / formatStringFloat(pvp.text)) * 100,2)
+                print('Descuento calculado: ' + discount)
             else:
                 discount = discount[1] if len(discount) == 2 else discount
 
@@ -126,8 +136,8 @@ def scrapingOfertasDiarias(content, header, categoria):
             price_discount = round(formatStringFloat(products['pvp']) * int(products['discount']) / 100,2)
             print('precio de descuento: ' + str(price_discount))
             if res['exists'] == False:
-                msg = f"{emojis['sparkles']} <b>{header}</b> {emojis['sparkles']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n{emojis['check']} <b>Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {price_discount} € ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
-                send_message(products['image'], msg)
+                msg = f"{emojis['sparkles']} <b>{header}</b> {emojis['sparkles']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n{emojis['check']} <b>Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {price_discount} € ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n"
+                send_message(products['image'], msg, gen_markup(products['link']))
                 registrarHistorial(products)
                 sleep(tiempo)
     # except:
@@ -164,8 +174,8 @@ def scrapingReacondicionados(content, header, categoria):
                     res = __existInDB(products['title'])
                     if res['exists'] == False:
                         price_discount = round(formatStringFloat(products['pvp']) * int(products['discount']) / 100,2)
-                        msg = f"{emojis['recycling']} <b>{header}</b> {emojis['recycling']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']} Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {price_discount} € ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n{emojis['link']} Link: {products['link']}"
-                        send_message(products['image'], msg)
+                        msg = f"{emojis['recycling']} <b>{header}</b> {emojis['recycling']}\n\n{emojis['rayo']} <b>{products['title']}</b> {emojis['rayo']}\n\n <b>{emojis['check']} Precio Oferta: {products['price']}  {emojis['check']}</b>\n{emojis['fire']} <b>Descuento: {price_discount} € ({products['discount']}%)</b> {emojis['fire']}\n\n{emojis['prohibited']} PVP ≈ {products['pvp']} {emojis['prohibited']}\n\n{emojis['stars']} <b>Estrellas:</b> {products['stars']}\n\n" #{emojis['link']} Link: {products['link']}
+                        send_message(products['image'], msg, gen_markup(products['link']))
                         registrarHistorial(products)
                         sleep(tiempo)
             except:
@@ -206,3 +216,5 @@ for url in urls:
     except:
         print('Error al analizar el sitio web')
 s.close()
+
+
