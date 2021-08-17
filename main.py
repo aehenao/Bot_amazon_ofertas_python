@@ -208,7 +208,7 @@ def getProducts(data,s):
 
 print(f"Esto en ejecución {fecha_msg}...")
 urls = leerJson()
-s = HTMLSession()
+s = HTMLSession(browser_args=["--no-sandbox"])
 for url in urls:
     try:
         print('Analizando la url para ' + url['categoria'])
