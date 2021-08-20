@@ -8,7 +8,7 @@ import json
 import re
 import requests
 from requests.structures import CaseInsensitiveDict
-
+from time import sleep
 
 bot = telebot.TeleBot("1921336823:AAFuNJvCdCbdKvf4hpz_e9eD7LYAbWKHP5g", parse_mode='HTML')
 grupo_id = '@amazonchollitos'
@@ -206,15 +206,18 @@ def getProducts(data,s):
 
     #print(products)
 
-print(f"Esto en ejecución {fecha_msg}...")
-urls = leerJson()
-s = HTMLSession(browser_args=["--no-sandbox"])
-for url in urls:
-    try:
-        print('Analizando la url para ' + url['categoria'])
-        getProducts(url, s)
-    except:
-        print('Error al analizar el sitio web')
-s.close()
+while True:
+    print(f"Esto en ejecución {fecha_msg}...")
+    urls = leerJson()
+    s = HTMLSession(browser_args=["--no-sandbox"])
+    for url in urls:
+        try:
+            print('Analizando la url para ' + url['categoria'])
+            getProducts(url, s)
+        except:
+            print('Error al analizar el sitio web')
+    s.close()
+    sleep(60)
+    print('Script finalizado')
 
 
